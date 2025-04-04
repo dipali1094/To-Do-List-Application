@@ -1,11 +1,15 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const controller = require("../controllers/todo.controller");
+const {
+    getTodoLists,
+    addTodoList,
+    addTaskToList,
+    updateTaskStatus
+} = require('../controllers/todo.controller');
 
-router.get("/lists", controller.getAllLists);
-router.get("/lists/:id/tasks", controller.getTasksByListId);
-router.post("/lists", controller.addList);
-router.post("/lists/:id/tasks", controller.addTask);
-router.put("/lists/:id/tasks/:taskId", controller.toggleTask);
+router.get('/api/todos', getTodoLists);
+router.post('/api/todos', addTodoList);
+router.post('/api/todos/:listId/tasks', addTaskToList);
+router.put('/api/todos/:listId/tasks/:taskId', updateTaskStatus);
 
 module.exports = router;

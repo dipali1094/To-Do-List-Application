@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { TodoService } from '../../services/todo.service';
 import { TodoList, Task } from '../../models/todo.model';
 
@@ -12,86 +11,76 @@ import { TodoList, Task } from '../../models/todo.model';
   templateUrl: './todo-list.component.html',
   styleUrls: ['./todo-list.component.css']
 })
-
 export class TodoListComponent implements OnInit {
+  // Local state variables
   todoLists: TodoList[] = [];
   selectedList: TodoList | null = null;
   newListTitle = '';
   newTaskTitle = '';
   newTaskDescription = '';
-  filter: 'all' | 'completed' | 'active' = 'all';
-  visibleTasks: Task[] = [];
   showAddTask = false;
 
   constructor(private todoService: TodoService) { }
 
   ngOnInit(): void {
-    this.refreshLists();
+    // Subscribe to the BehaviorSubject to sync UI with service state
+    this.todoService.todoLists$.subscribe(lists => this.todoLists = lists);
   }
 
+  // Set the selected list and hide the Add Task form
   selectList(list: TodoList): void {
     this.selectedList = list;
-    this.filter = 'all';
+    this.showAddTask = false;
   }
 
-  addList(): void {
-    if (this.newListTitle.trim()) {
-      const newList = this.todoService.addTodoList(this.newListTitle.trim());
-      this.todoLists.push(newList);
-      this.selectList(newList);
-      this.newListTitle = '';
-    }
+  // Add a new to-do list (title only) and reset input
+  async addList(): Promise<void> {
+    if (!this.newListTitle.trim()) return;
+    await this.todoService.addTodoList(this.newListTitle.trim());
+    this.newListTitle = '';
   }
 
-  addTask(): void {
-    if (this.newTaskTitle.trim() && this.selectedList) {
-      const task: Task = {
-        id: Date.now(),
-        title: this.newTaskTitle.trim(),
-        description: this.newTaskDescription.trim(),
-        completed: false
-      };
-      this.todoService.addTask(this.selectedList.id, task);
-      // Refresh the selected list to reflect new task
-      const updatedList = this.todoLists.find(list => list.id === this.selectedList?.id);
-      if (updatedList) {
-        this.selectedList = updatedList;
-      }
+  // Add a new task to the currently selected list
+  async addTask(): Promise<void> {
+    if (!this.newTaskTitle.trim() || !this.selectedList) return;
 
-      this.newTaskTitle = '';
-      this.newTaskDescription = '';
-    }
+    const task: Task = {
+      id: Date.now(),
+      title: this.newTaskTitle.trim(),
+      description: this.newTaskDescription.trim(),
+      completed: false
+    };
+
+    await this.todoService.addTask(this.selectedList.id, task);
+    
+    // 🔁 Refresh selectedList from updated todoLists
+    const updatedList = this.todoService.getTodoLists().find(l => l.id === this.selectedList?.id);
+    if (updatedList) this.selectedList = updatedList;
+
+    // Clear input fields
+    this.newTaskTitle = '';
+    this.newTaskDescription = '';
   }
 
-  toggleTask(task: Task): void {
+  // Toggle task completion status
+  async toggleTask(task: Task): Promise<void> {
     if (this.selectedList) {
-      this.todoService.toggleTaskStatus(this.selectedList.id, task.id);
-      const updatedLists = this.todoService.getTodoLists();
-      this.todoLists = updatedLists;
-      this.selectedList = updatedLists.find(list => list.id === this.selectedList?.id) || null;
+      await this.todoService.toggleTaskStatus(this.selectedList.id, task.id);
     }
   }
-  
-  toggleAddTask(): void {
-    this.showAddTask = !this.showAddTask;
+
+  // Count how many tasks are completed in a given list
+  getCompletedCount(list: TodoList): number {
+    return list.tasks.filter(t => t.completed).length;
   }
 
+  // Filtered tasks to display for the selected list
   filteredTasks(): Task[] {
     return this.selectedList ? this.selectedList.tasks : [];
   }
 
-  getCompletedCount(list: TodoList): number {
-    return list.tasks.filter((t: Task) => t.completed).length;
+  // Toggle the visibility of the Add Task input section
+  toggleAddTask(): void {
+    this.showAddTask = !this.showAddTask;
   }
-
-  private refreshLists(): void {
-    this.todoLists = this.todoService.getTodoLists();
-
-    // After refreshing all lists, update the selectedList with fresh reference
-    if (this.selectedList) {
-      const updatedList = this.todoLists.find(list => list.id === this.selectedList?.id);
-      this.selectedList = updatedList ? { ...updatedList } : null;
-    }
-  }
-
 }

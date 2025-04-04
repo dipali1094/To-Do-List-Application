@@ -5,14 +5,17 @@
   </div>
 
   <!-- Add New To-Do List -->
-  <div class="row g-2 align-items-center mb-3">
+  <form #listForm="ngForm" class="row g-2 align-items-center mb-3">
     <div class="col-md-9">
-      <input [(ngModel)]="newListTitle" class="form-control" placeholder="New list title" />
+      <input [(ngModel)]="newListTitle" name="listTitle" required minlength="3" class="form-control"
+        placeholder="New list title" #listTitle="ngModel" />
     </div>
     <div class="col-md-3">
-      <button class="btn btn-primary w-100" (click)="addList()">Add New List</button>
+      <button class="btn btn-primary w-100" (click)="addList()" [disabled]="!listForm.valid">
+        Add New List
+      </button>
     </div>
-  </div>
+  </form>
 
   <!-- To-Do Lists -->
   <div class="mb-4">
@@ -29,7 +32,6 @@
 
   <!-- Task Section (if a list is selected) -->
   <div *ngIf="selectedList">
-    <!-- Filter -->
     <h4 class="mb-3">📝 Tasks
       <button class="btn btn-sm btn-primary" (click)="toggleAddTask()">
         {{ showAddTask ? 'Add New' : 'Add New' }}
@@ -37,22 +39,25 @@
     </h4>
 
     <!-- Add New Task Input (conditionally visible) -->
-    <div *ngIf="showAddTask" class="mb-3">
+    <form #taskForm="ngForm" *ngIf="showAddTask" class="mb-3">
       <div class="row g-2 align-items-center mb-3">
         <div class="col-md-4">
-          <input type="text" class="form-control" placeholder="Task title" [(ngModel)]="newTaskTitle" />
+          <input type="text" class="form-control" placeholder="Task title" name="taskTitle" required minlength="3"
+            [(ngModel)]="newTaskTitle" #taskTitle="ngModel" />
         </div>
         <div class="col-md-7">
-          <input type="text" class="form-control" placeholder="Task description" [(ngModel)]="newTaskDescription" />
+          <input type="text" class="form-control" placeholder="Task description" name="taskDesc" required minlength="5"
+            [(ngModel)]="newTaskDescription" #taskDesc="ngModel" />
         </div>
         <div class="col-md-1">
-          <button class="btn btn-success w-100" (click)="addTask()">Add</button>
+          <button class="btn btn-success w-100" (click)="addTask()" [disabled]="!taskForm.valid">
+            Add
+          </button>
         </div>
       </div>
-      
-    </div>
+    </form>
 
-    <!-- Task List -->
+  <!-- Task List -->
     <ul class="list-group mb-3">
       <li class="list-group-item" *ngFor="let task of filteredTasks()">
         <div class="d-flex align-items-center">

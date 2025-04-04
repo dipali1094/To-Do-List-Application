@@ -1,12 +1,16 @@
-const express = require("express");
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const todoRoutes = require('./routes/todo.routes');
+
 const app = express();
-// const db = require('./config/db'); 
-const todoRoutes = require("./routes/todo.routes");
-
-app.use(express.json());
-app.use("/api", todoRoutes);
-
 const PORT = 3000;
+
+app.use(cors());
+app.use(bodyParser.json());
+
+app.use('/', todoRoutes);
+
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
