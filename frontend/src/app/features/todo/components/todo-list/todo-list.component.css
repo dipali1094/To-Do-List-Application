@@ -1,0 +1,58 @@
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+li {
+  cursor: pointer;
+}
+
+.active {
+  background-color: #d3d3d3;
+  font-weight: bold;
+}
+
+input {
+  padding: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+button {
+  margin-top: 5px;
+}
+
+.dashboard-container {
+  background-color: #f8f9fa;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.todo-title {
+  color:#f8f9fa;
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: bold;
+}
+
+.list-group-item {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+::placeholder {
+  color: #adb5bd; /* soft gray */
+  opacity: 1; /* full opacity so it's visible */
+}
+
+/* For cross-browser compatibility */
+input::placeholder,
+textarea::placeholder {
+  color: #adb5bd;
+}
+
+

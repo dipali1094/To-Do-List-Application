@@ -1,0 +1,74 @@
+<div class="dashboard-container container p-4 mt-3 rounded">
+  <!-- Header -->
+  <div class="text-left bg-warning p-3 mb-4 rounded">
+    <h2 class="todo-title">📝 To-Do App</h2>
+  </div>
+
+  <!-- Add New To-Do List -->
+  <div class="row g-2 align-items-center mb-3">
+    <div class="col-md-9">
+      <input [(ngModel)]="newListTitle" class="form-control" placeholder="New list title" />
+    </div>
+    <div class="col-md-3">
+      <button class="btn btn-primary w-100" (click)="addList()">Add New List</button>
+    </div>
+  </div>
+
+  <!-- To-Do Lists -->
+  <div class="mb-4">
+    <ul class="list-group">
+      <li class="list-group-item" *ngFor="let list of todoLists" [class.active]="selectedList?.id === list.id"
+        (click)="selectList(list)" (keyup.enter)="selectList(list)" tabindex="0">
+        <strong>{{ list.title }}</strong>
+        <div class="text-muted">
+          {{ list.tasks.length }} tasks - {{ getCompletedCount(list) }} completed
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Task Section (if a list is selected) -->
+  <div *ngIf="selectedList">
+    <!-- Filter -->
+    <h4 class="mb-3">📝 Tasks
+      <button class="btn btn-sm btn-primary" (click)="toggleAddTask()">
+        {{ showAddTask ? 'Add New' : 'Add New' }}
+      </button>
+    </h4>
+
+    <!-- Add New Task Input (conditionally visible) -->
+    <div *ngIf="showAddTask" class="mb-3">
+      <div class="row g-2 align-items-center mb-3">
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Task title" [(ngModel)]="newTaskTitle" />
+        </div>
+        <div class="col-md-7">
+          <input type="text" class="form-control" placeholder="Task description" [(ngModel)]="newTaskDescription" />
+        </div>
+        <div class="col-md-1">
+          <button class="btn btn-success w-100" (click)="addTask()">Add</button>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Task List -->
+    <ul class="list-group mb-3">
+      <li class="list-group-item" *ngFor="let task of filteredTasks()">
+        <div class="d-flex align-items-center">
+          <div class="form-check me-3 m-0">
+            <input type="checkbox" class="form-check-input" [checked]="task.completed" (change)="toggleTask(task)" />
+          </div>
+          <div>
+            <div>
+              <strong [class.text-decoration-line-through]="task.completed">
+                {{ task.title }}
+              </strong>
+            </div>
+            <small class="text-muted">{{ task.description }}</small>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
